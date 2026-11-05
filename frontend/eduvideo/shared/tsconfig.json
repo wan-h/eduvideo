@@ -1,0 +1,25 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "incremental": true,
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.shared.tsbuildinfo",
+    "jsx": "react-jsx",
+    "lib": [
+      "ES2023",
+      "DOM"
+    ],
+    "types": [
+      "node"
+    ],
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "ignoreDeprecations": "6.0"
+  },
+  "include": [
+    "src/**/*",
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}

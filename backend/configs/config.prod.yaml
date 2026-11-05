@@ -1,0 +1,191 @@
+# 敏感信息（数据库/对象存储密码、模型 API Key）一律留空，
+# 通过 docker/.env 或环境变量注入（变量名见 docker/.env.example），请勿提交真实凭据。
+common:
+  name: "education-ai"
+  version: "v0.0.1"
+  log_level: "INFO"
+  env: "prod"
+  # 调用大模型时的图片传入方式: url(图片地址) | base64(data url，适用于大模型无法访问的本地 MinIO)
+  llm_image_input: "base64"
+middleware:
+  database:
+    host: "pgbouncer"
+    port: "5432"
+    user: "postgres"
+    passwd: ""
+    db: "education-ai"
+  storage:
+    domain: "http://localhost/storage"
+    host: "http://minio:9000"
+    # 浏览器可达的 S3 地址(预签名上传用)，部署到服务器时改为 http://<服务器地址>:9000
+    public_host: "http://localhost:9000"
+    user: "admin"
+    passwd: ""
+    bucket: "eduvideo"
+  temporal:
+    server_url: "temporal-server:7233"
+product:
+  eduvideo:
+    tts_clone:
+      base_url: "https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation"
+      api_key: ""
+      model: "MiniMax/speech-2.8-turbo"
+      provider: "aliyun"
+      limit: 2
+    agent_chat:
+      base_url: "https://api.deepseek.com"
+      api_key: ""
+      model: "deepseek-v4-flash"
+    magic_wand:
+      text_model:
+        base_url: "https://api.deepseek.com"
+        api_key: ""
+        model: "deepseek-v4-flash"
+      image_model:
+        base_url: "https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation"
+        api_key: ""
+        model: "wan2.6-t2i"
+        edit_model: "wan2.6-image"
+        provider: "aliyun"
+    share_video_samples:
+      - title: "数学奥数题讲解"
+        url: "https://light4ai.space/education-ai/eduvideo/video-samples/%E6%95%B0%E5%AD%A6%E5%A5%A5%E6%95%B0%E9%A2%98%E8%AE%B2%E8%A7%A3.mp4"
+      - title: "生物选择题讲解"
+        url: "https://light4ai.space/education-ai/eduvideo/video-samples/%E7%94%9F%E7%89%A9%E9%80%89%E6%8B%A9%E9%A2%98%E8%AE%B2%E8%A7%A3.mp4"
+      - title: "化学选择题讲解"
+        url: "https://light4ai.space/education-ai/eduvideo/video-samples/%E5%8C%96%E5%AD%A6%E6%9C%89%E6%9C%BA%E7%89%A9%E9%80%89%E6%8B%A9%E9%A2%98.mp4"
+      - title: "数学英语讲解"
+        url: "https://light4ai.space/education-ai/eduvideo/video-samples/%E6%95%B0%E5%AD%A6%E8%8B%B1%E8%AF%AD%E8%AE%B2%E8%A7%A3.mp4"
+      - title: "物理解答题讲解"
+        url: "https://light4ai.space/education-ai/eduvideo/video-samples/%E7%89%A9%E7%90%86%E5%BC%B9%E7%B0%A7%E8%A7%A3%E7%AD%94%E9%A2%98.mp4"
+      - title: "生物选择题讲解"
+        url: "https://light4ai.space/education-ai/eduvideo/video-samples/%E7%94%9F%E7%89%A9%E9%80%89%E6%8B%A9%E9%A2%98%E8%AE%B2%E8%A7%A3.mp4"
+    voice_samples:
+      - title: "普通话女声"
+        model_id: "female-shaonv-jingpin"
+        url: "https://light4ai.space/education-ai/eduvideo/voice-samples/zh_female_putonghua.mp3"
+        voice_type: "zh_female_putonghua"
+        language: "chinese"
+      - title: "普通话男声"
+        model_id: "male-qn-jingying-jingpin"
+        url: "https://light4ai.space/education-ai/eduvideo/voice-samples/zh_male_putonghua.mp3"
+        voice_type: "zh_male_putonghua"
+        language: "chinese"
+      - title: "美英女声"
+        model_id: "English_CalmWoman"
+        url: "https://light4ai.space/education-ai/eduvideo/voice-samples/en_female_american.mp3"
+        voice_type: "en_female_american"
+        language: "english"
+      - title: "美英男声"
+        model_id: "English_Gentle-voiced_man"
+        url: "https://light4ai.space/education-ai/eduvideo/voice-samples/en_male_american.mp3"
+        voice_type: "en_male_american"
+        language: "english"
+      - title: "英英女声"
+        model_id: "English_Graceful_Lady"
+        url: "https://light4ai.space/education-ai/eduvideo/voice-samples/en_female_british.mp3"
+        voice_type: "en_female_british"
+        language: "english"
+      - title: "英英男声"
+        model_id: "English_Magnetic_Male_12"
+        url: "https://light4ai.space/education-ai/eduvideo/voice-samples/en_male_british.mp3"
+        voice_type: "en_male_british"
+        language: "english"
+    home_display_info:
+      notifications:
+        - "🎉🎉🎉版本正式上线，欢迎使用！"
+      input_placeholder: "给我讲解一下什么是牛顿第一定律 / 多用生活化例子讲解这道题目"
+      file_tips:
+        - "题目提取将逐页处理，请核对文件是否有重复、空白页"
+        - "暂不支持听力等特殊题目"
+
+tasks:
+  server_url: "http://srv-education-api:8000"
+  base_task:
+    start_to_close_timeout: 3
+    task_queue: "base_task"
+    concurrency: 100
+  max_retries: 2
+  doc_parse:
+    start_to_close_timeout: 10
+    task_queue: "doc_parse"
+    concurrency: 3
+    mineru:
+      base_url: "https://mineru.net/api/v4"
+      api_key: ""
+      # model: "vlm"
+      model: "pipeline"
+      provider: "mineru"
+  question_extract:
+    start_to_close_timeout: 5
+    task_queue: "question_extract"
+    concurrency: 3
+    extractor:
+      base_url: "https://api.deepseek.com"
+      api_key: ""
+      model: "deepseek-v4-flash"
+  readable_tts:
+    max_task_queue_activities_per_second: 0.2
+    start_to_close_timeout: 3
+    task_queue: "readable_tts"
+    fast_task_queue: "fast_readable_tts"
+    concurrency: 10
+    chinese_translate:
+      base_url: "https://api.deepseek.com"
+      api_key: ""
+      model: "deepseek-v4-flash"
+    latex_translate:
+      base_url: "https://api.deepseek.com"
+      api_key: ""
+      model: "deepseek-v4-flash"
+    chinese:
+      base_url: "https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation"
+      api_key: ""
+      model: "MiniMax/speech-2.8-turbo"
+      provider: "aliyun"
+    english:
+      base_url: "https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation"
+      api_key: ""
+      model: "MiniMax/speech-2.8-turbo"
+      provider: "aliyun"
+  question_explanation_video_gen_script:
+    start_to_close_timeout: 10
+    task_queue: "question_explanation_video_gen_script"
+    concurrency: 3
+    handout_generator:
+      base_url: "https://api.deepseek.com"
+      api_key: ""
+      model: deepseek-v4-flash
+    image_generator:
+      base_url: "https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation"
+      api_key: ""
+      model: "wan2.6-t2i"
+      edit_model: "wan2.6-image"
+      provider: "aliyun"
+  question_explanation_video_gen_synthesis:
+    start_to_close_timeout: 20
+    task_queue: "question_explanation_video_gen_synthesis"
+    concurrency: 1
+    render_max_concurrency: 8
+    render_parallel_chunks: 4
+  question_solve:
+    # TODO
+    start_to_close_timeout: 10
+    task_queue: "question_solve"
+    concurrency: 20
+    solver:
+      base_url: "https://api.deepseek.com"
+      api_key: ""
+      model: deepseek-v4-flash
+  question_parse:
+    start_to_close_timeout: 3
+    task_queue: "question_parse"
+    concurrency: 20
+    parser:
+      base_url: "https://api.deepseek.com"
+      api_key: ""
+      model: deepseek-v4-flash
+
+server:
+  ip: "0.0.0.0"
+  port: 8000

@@ -1,0 +1,41 @@
+# Frontend .dockerignore
+# 排除不需要打包的文件和目录
+
+# 依赖
+**/node_modules
+
+# 构建产物与缓存
+**/dist
+**/*.tsbuildinfo
+.vite
+.turbo
+coverage
+
+# 测试和临时文件
+test-output
+
+# 环境变量（绝不提交到镜像）
+.env
+.env.local
+.env.*
+
+# 操作系统文件
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Docker 相关文件（避免嵌套）
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# IDE
+.vscode
+.idea
+
+# 技能文件
+.agents/
+.claude/

@@ -1,0 +1,47 @@
+{
+  "question_metadata": {
+    "title": "自定义背景测试",
+    "type": "math",
+    "level": "easy",
+    "subject": "math",
+    "stage": "senior",
+    "knowledge_points": ["addition"]
+  },
+  "question_content": {
+    "stem": "1+1等于几？",
+    "options": ["1", "2", "3", "4"]
+  },
+  "scenes": {
+    "question_introduction": {
+      "stem": "1+1等于几？",
+      "options": ["1", "2", "3", "4"],
+      "subtitles": [
+        { "text": "今天我们来学习一道简单的数学题", "audio": "", "duration": 2000 },
+        { "text": "1+1等于几呢？", "audio": "", "duration": 1500 }
+      ]
+    },
+    "question_solution": {
+      "segments": [
+        {
+          "title": "解题步骤",
+          "content": "1+1等于2，这是最基本的加法运算。",
+          "subtitles": [
+            { "text": "1+1等于2", "audio": "", "duration": 2000 },
+            { "text": "这是最基本的加法运算", "audio": "", "duration": 2000 }
+          ]
+        }
+      ]
+    },
+    "question_key_points": {
+      "segments": [
+        {
+          "title": "重点总结",
+          "content": "加法是把两个数合并在一起的运算。",
+          "subtitles": [
+            { "text": "加法是把两个数合并在一起的运算", "audio": "", "duration": 2000 }
+          ]
+        }
+      ]
+    }
+  }
+}

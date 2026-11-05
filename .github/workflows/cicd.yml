@@ -1,0 +1,315 @@
+# ============================================================
+# 流水线: changes -> verify -> build
+# ============================================================
+# 触发:
+#   * pull_request : 按 base..head diff 判定范围, 只跑受影响的一端
+#   * push tag v*  : 跳过 diff, 前后端全量执行
+#
+#   1. changes : MR 对比 base..head 判定范围; tag 直接全量
+#   2. verify  : 前后端并行执行 lint / typecheck / 单测 + 覆盖率门禁
+#   3. build   : 对应端 verify 通过后再并行构建镜像并推送
+#
+# 范围判定 (仅 MR):
+#   * 仅 backend/**   改动 -> 后端 verify + 重建后端镜像
+#   * 仅 frontend/**  改动 -> 前端 verify + 重建前端镜像, 并重建后端镜像
+#     (后端镜像内置 Remotion 前端 workspace, 必须带上新的前端实现)
+#   * 其它任意路径 -> 前后端全量
+#
+# 镜像 tag:
+#   * MR  : head commit 的短 hash (7 位)
+#   * tag : 与 tag 同名 (如 v1.2.3)
+#
+# fork PR 读不到 secrets: 只执行 verify, 跳过镜像构建与推送。
+#
+# 镜像为多架构 (linux/amd64 + linux/arm64): CI 在 amd64 runner 上通过 QEMU
+# 交叉构建 arm64, 推送同一 tag 的 manifest list, Mac / Linux 均可直接运行。
+# ============================================================
+
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+# 同一 MR / tag 连续 push 时取消旧运行, 避免重复排队构建
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ----------------------------------------------------------
+  # 变更范围检测
+  # ----------------------------------------------------------
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.detect.outputs.backend }}
+      frontend: ${{ steps.detect.outputs.frontend }}
+      # 是否需要重建后端镜像(后端或前端任一变动)
+      backend_image: ${{ steps.detect.outputs.backend_image }}
+      # 镜像 tag: MR 为短 commit, tag 触发为 tag 名
+      image_tag: ${{ steps.detect.outputs.image_tag }}
+    steps:
+      - name: Checkout code
+        # tag 触发不需要 diff, 跳过 checkout
+        if: github.event_name == 'pull_request'
+        uses: actions/checkout@v4
+        with:
+          # fork PR 拿不到 GH_PAT, 回退到只读的 GITHUB_TOKEN
+          token: ${{ secrets.GH_PAT || github.token }}
+          # 需要完整历史才能拿到 base 与 head 的 commit 做 diff
+          fetch-depth: 0
+
+      - name: Classify changed paths
+        id: detect
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+
+          if [ "$GITHUB_EVENT_NAME" = "push" ]; then
+            # tag 触发: 不比较差异, 前后端全量执行
+            echo "Tag ${GITHUB_REF_NAME}; running full pipeline."
+            backend=true
+            frontend=true
+            image_tag="$GITHUB_REF_NAME"
+            changed=""
+          else
+            backend=false
+            frontend=false
+            # MR 镜像使用 head commit 的短 hash
+            image_tag="$(printf '%s' "$PR_HEAD_SHA" | cut -c1-7)"
+
+            echo "Comparing ${PR_BASE_SHA}..${PR_HEAD_SHA}"
+            changed="$(git diff --name-only "$PR_BASE_SHA" "$PR_HEAD_SHA")"
+
+            # 没有任何差异时按全量处理
+            if [ -z "$changed" ]; then
+              backend=true
+              frontend=true
+            fi
+          fi
+
+          while IFS= read -r file; do
+            [ -z "$file" ] && continue
+            case "$file" in
+              backend/*)
+                backend=true
+                ;;
+              frontend/*)
+                frontend=true
+                ;;
+              *)
+                # CI / compose / 根目录配置等: 按"其他改动"处理, 全量执行
+                backend=true
+                frontend=true
+                ;;
+            esac
+          done <<< "$changed"
+
+          # 后端镜像内置 Remotion 前端 workspace: 前端任何改动都要重建后端镜像
+          backend_image=false
+          if [ "$backend" = "true" ] || [ "$frontend" = "true" ]; then
+            backend_image=true
+          fi
+
+          echo "backend=$backend" >> "$GITHUB_OUTPUT"
+          echo "frontend=$frontend" >> "$GITHUB_OUTPUT"
+          echo "backend_image=$backend_image" >> "$GITHUB_OUTPUT"
+          echo "image_tag=$image_tag" >> "$GITHUB_OUTPUT"
+
+  # ----------------------------------------------------------
+  # verify: 前后端并行
+  # ----------------------------------------------------------
+  verify-backend:
+    name: Verify backend
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # fork PR 拿不到 GH_PAT, 回退到只读的 GITHUB_TOKEN
+          token: ${{ secrets.GH_PAT || github.token }}
+
+      - name: Install libmagic
+        # python-magic 在 import 时通过 ctypes 加载 libmagic
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libmagic1
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
+
+      - name: Install dependencies
+        run: uv sync --frozen --no-install-project
+
+      - name: Lint and format check
+        run: |
+          uv run --no-sync ruff check .
+          uv run --no-sync ruff format --check .
+
+      - name: Prepare dev config
+        # config.dev.yaml 已被 .gitignore 忽略（含本地密钥），测试前从模板生成
+        run: cp configs/config.example.yaml configs/config.dev.yaml
+
+      - name: Unit tests with coverage gate
+        # 覆盖率阈值由 pyproject.toml 的 --cov-fail-under 控制
+        run: uv run --no-sync pytest
+
+  verify-frontend:
+    name: Verify frontend
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: frontend/eduvideo
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # fork PR 拿不到 GH_PAT, 回退到只读的 GITHUB_TOKEN
+          token: ${{ secrets.GH_PAT || github.token }}
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: frontend/eduvideo/.node-version
+          cache: pnpm
+          cache-dependency-path: frontend/eduvideo/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build shared package
+        run: pnpm --filter @ask2vid/shared build
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Unit tests with coverage gate
+        # 覆盖率阈值由 vite.config.ts 的 coverage.thresholds 控制
+        run: pnpm test:coverage
+
+  # ----------------------------------------------------------
+  # build: 各自 verify 通过后并行构建推送
+  # ----------------------------------------------------------
+  build-backend:
+    name: Build backend image
+    # 后端镜像内含 Remotion 前端 workspace: 前端改动同样重建, 并要等两端 verify 都通过
+    # 有改动的一端 verify 必须 success; 无改动的一端 verify 会 skip, 不阻塞构建
+    # fork PR 拿不到 secrets, 不构建/推送镜像
+    needs: [changes, verify-backend, verify-frontend]
+    if: |
+      always() &&
+      (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) &&
+      needs.changes.outputs.backend_image == 'true' &&
+      (needs.changes.outputs.backend == 'false' || needs.verify-backend.result == 'success') &&
+      (needs.changes.outputs.frontend == 'false' || needs.verify-frontend.result == 'success')
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # GH_PAT 未配置时回退到内置 GITHUB_TOKEN
+          token: ${{ secrets.GH_PAT || github.token }}
+
+      - name: Set up QEMU
+        # 多架构构建: 在 amd64 runner 上模拟 arm64
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to ALIYUN Docker Hub
+        uses: docker/login-action@v3
+        with:
+          registry: registry.cn-hangzhou.aliyuncs.com
+          username: ${{ secrets.ALIYUN_DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.ALIYUN_DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Build and push backend image
+        # 统一后端镜像: 基于 backend/Dockerfile, 内置 Remotion 运行时, API 与 worker 共用
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: backend/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          # 阿里云 ACR 不识别 attestation 清单使用的 application/vnd.oci.empty.v1+json
+          # 媒体类型, 开启 provenance 会导致整个 manifest list 推送被拒
+          provenance: false
+          tags: registry.cn-hangzhou.aliyuncs.com/${{ secrets.ALIYUN_DOCKER_HUB_NAMESPACE }}/srv-eduvideo-api:${{ needs.changes.outputs.image_tag }}
+          cache-from: type=gha,scope=backend
+          cache-to: type=gha,mode=max,scope=backend
+
+  build-frontend:
+    name: Build frontend image
+    needs: [changes, verify-frontend]
+    # 必须 verify-frontend 通过; fork PR 拿不到 secrets, 不构建/推送镜像
+    if: |
+      needs.changes.outputs.frontend == 'true' &&
+      needs.verify-frontend.result == 'success' &&
+      (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # GH_PAT 未配置时回退到内置 GITHUB_TOKEN
+          token: ${{ secrets.GH_PAT || github.token }}
+
+      - name: Set up QEMU
+        # 多架构构建: 在 amd64 runner 上模拟 arm64
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to ALIYUN Docker Hub
+        uses: docker/login-action@v3
+        with:
+          registry: registry.cn-hangzhou.aliyuncs.com
+          username: ${{ secrets.ALIYUN_DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.ALIYUN_DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: frontend/eduvideo
+          file: frontend/eduvideo/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          # 同上: 关闭 provenance, 避免 ACR 拒绝 OCI empty 媒体类型的 attestation 清单
+          provenance: false
+          tags: registry.cn-hangzhou.aliyuncs.com/${{ secrets.ALIYUN_DOCKER_HUB_NAMESPACE }}/web-eduvideo:${{ needs.changes.outputs.image_tag }}
+          cache-from: type=gha,scope=frontend
+          cache-to: type=gha,mode=max,scope=frontend

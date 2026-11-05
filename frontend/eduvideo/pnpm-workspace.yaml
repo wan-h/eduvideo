@@ -1,0 +1,46 @@
+packages:
+  - "shared"
+  - "server"
+allowBuilds:
+  esbuild: true
+  msw: true
+
+# pnpm catalog: 集中管理跨包共享依赖版本
+# 子包使用 "catalog:" 引用，执行 pnpm up 时只需在此处更新一次
+catalog:
+  # remotion 相关依赖版本必须保持一致，否则会导致构建失败
+  "@remotion/bundler": "4.0.484"
+  "@remotion/cli": "4.0.484"
+  "@remotion/fonts": "4.0.484"
+  "@remotion/google-fonts": "4.0.484"
+  "@remotion/layout-utils": "4.0.484"
+  "@remotion/media": "4.0.484"
+  "@remotion/media-parser": "4.0.484"
+  "@remotion/player": "4.0.484"
+  "@remotion/preload": "4.0.484"
+  "@remotion/renderer": "4.0.484"
+  "@remotion/web-renderer": "4.0.484"
+  # 共享依赖版本
+  "@types/node": "^24.13.2"
+  "@types/react": "^19.2.17"
+  "@types/react-dom": "^19.2.3"
+  katex: "0.16.47"
+  react: "^19.2.7"
+  react-dom: "^19.2.7"
+  remotion: "4.0.484"
+  typescript: "~6.0.3"
+  uuid: "^13.0.2"
+  vitest: "^4.1.9"
+  zod: "^4.4.3"
+
+# 强制覆盖嵌套依赖版本，解决子包版本不一致问题
+overrides:
+  # remotion 相关依赖版本必须保持一致（见 catalog 说明）
+  # @platejs/math 捆绑了独立 katex@0.16.22，与项目 katex@0.16.47 不兼容
+  # 两处 KaTeX 实例不一致会导致 mhchem 插件（\ce{}, \pu{}）仅在预览路径生效，
+  # 编辑器内的公式节点无法渲染化学/物理公式
+  # 强制统一到 0.16.47，katex.render() API 在 0.16.x 全系列稳定，无风险
+  "@platejs/math>katex": "0.16.47"
+  remotion: "4.0.484"
+  html-encoding-sniffer: "^4.0.0"
+  whatwg-url: "^14.1.0"

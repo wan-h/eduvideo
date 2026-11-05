@@ -1,0 +1,12 @@
+# 本地开发专用: 只启动中间件，不启动 API/Workers/前端/nginx
+#   postgres + pgbouncer + minio
+#   temporal-admin-tools / temporal-server / temporal-create-namespace / temporal-ui
+# 用法: docker compose -f docker-compose-middleware.yaml up -d
+include:
+  - path: docker-compose-infra.yaml
+  - path: docker-compose-temporalio.yaml
+
+networks:
+  shared_network:
+    driver: bridge
+    internal: true

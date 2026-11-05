@@ -1,0 +1,113 @@
+services:
+  # postgres
+  postgres:
+    image: postgres:${POSTGRES_VERSION}
+    restart: always
+    environment:
+      PGUSER: ${PGUSER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      PGDATA: ${PGDATA}
+      POSTGRES_MAX_CONNECTIONS: ${POSTGRES_MAX_CONNECTIONS}
+      POSTGRES_SHARED_BUFFERS: ${POSTGRES_SHARED_BUFFERS}
+      POSTGRES_WORK_MEM: ${POSTGRES_WORK_MEM}
+      POSTGRES_MAINTENANCE_WORK_MEM: ${POSTGRES_MAINTENANCE_WORK_MEM}
+      POSTGRES_EFFECTIVE_CACHE_SIZE: ${POSTGRES_EFFECTIVE_CACHE_SIZE}
+    command: >
+      postgres -c 'max_connections=${POSTGRES_MAX_CONNECTIONS}'
+               -c 'port=${POSTGRES_PORT}'
+               -c 'shared_buffers=${POSTGRES_SHARED_BUFFERS}'
+               -c 'work_mem=${POSTGRES_WORK_MEM}'
+               -c 'maintenance_work_mem=${POSTGRES_MAINTENANCE_WORK_MEM}'
+               -c 'effective_cache_size=${POSTGRES_EFFECTIVE_CACHE_SIZE}'
+    volumes:
+      - ../volumes/db/data:${PGDATA:-/var/lib/postgresql/data}
+    networks:
+      - shared_network
+      - default
+    healthcheck:
+      test: [ 'CMD', 'pg_isready', '-p', '${POSTGRES_PORT}' ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+  
+  # pgbouncer
+  pgbouncer:
+    image: edoburu/pgbouncer:${PGBOUNCER_VERSION}
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # 数据库主机名同样取自环境变量，避免与 POSTGRES_HOST 配置分歧
+      DB_HOST: ${POSTGRES_HOST}
+      DB_PORT: ${POSTGRES_PORT}
+      # 与 postgres 保持同一端口，容器内外无端口差异
+      LISTEN_PORT: ${POSTGRES_PORT}
+      DB_USER: ${PGUSER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: "*"
+      POOL_MODE: ${PGBOUNCER_POOL_MODE}
+      MAX_CLIENT_CONN: ${PGBOUNCER_MAX_CLIENT_CONN}
+      DEFAULT_POOL_SIZE: ${PGBOUNCER_DEFAULT_POOL_SIZE}
+      AUTH_TYPE: scram-sha-256
+      IGNORE_STARTUP_PARAMETERS: statement_timeout,idle_in_transaction_session_timeout
+    ports:
+      # pgbouncer完全代理postgres
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    networks:
+      - shared_network
+      - default
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h localhost -p ${POSTGRES_PORT} -U ${PGUSER}"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    
+  minio:
+    # 社区版 MinIO（Alpine 第三方构建，AGPLv3，无 License 限制）
+    image: alpine/minio:${STORAGE_VERSION}
+    restart: always
+    # 镜像默认 USER minio，宿主机数据卷属主不是 uid 1000，用 root 运行避免 /data 权限错误
+    user: "0:0"
+    volumes:
+      # Mount the redis data directory to the container.
+      - ../volumes/minio/data:/data
+    environment:
+      - MINIO_ROOT_USER=${STORAGE_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${STORAGE_ROOT_PASSWORD}
+    ports:
+      - "${STORAGE_API_PORT}:${STORAGE_API_PORT}"
+      - "${STORAGE_CONSOLE_PORT}:${STORAGE_CONSOLE_PORT}"
+    networks:
+      - shared_network
+      - default
+    # API 与控制台端口都取自环境变量，容器内监听与宿主机发布保持一致
+    command: server /data --address ":${STORAGE_API_PORT}" --console-address ":${STORAGE_CONSOLE_PORT}"
+    healthcheck:
+      # 该镜像只有 busybox wget（无 curl/mc），用 HTTP 健康探针
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:${STORAGE_API_PORT}/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # minio 的一次性初始化: 建 bucket + 匿名只读策略（幂等，每次 up 都会执行）
+  storage-init:
+    image: registry.cn-hangzhou.aliyuncs.com/docker-hub-aliyun-proxy/srv-eduvideo-api:${SRV_EDU_API_VERSION}
+    restart: "no"
+    depends_on:
+      minio:
+        condition: service_healthy
+    environment:
+      # 与 minio 监听端口、凭据同一来源，不重复配置
+      STORAGE_HOST: http://minio:${STORAGE_API_PORT}
+      STORAGE_USER: ${STORAGE_ROOT_USER}
+      STORAGE_PASSWORD: ${STORAGE_ROOT_PASSWORD}
+      STORAGE_BUCKET: ${STORAGE_BUCKET}
+    entrypoint: ["python", "/scripts/init_storage.py"]
+    volumes:
+      - ./configs/storage:/scripts:ro
+    networks:
+      - shared_network
+      - default

@@ -1,0 +1,12 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "outputs": ["dist/**"]
+    },
+    "dev": {
+      "with": ["@ask2vid/shared#dev"],
+      "cache": false
+    }
+  }
+}

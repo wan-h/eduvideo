@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://eduvideo.light4ai.com/sitemap.xml

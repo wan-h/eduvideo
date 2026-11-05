@@ -1,0 +1,36 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Testing and coverage
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.pytest_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv
+logs/
+
+# 运行产物与本地素材
+outputs/
+samples/
+*.log
+*.pid
+
+# 本地环境变量
+.env
+.env.*
+
+# 本地配置（含数据库/对象存储密码与模型 API Key），
+# 模板见 configs/config.example.yaml，复制为 config.dev.yaml 后填写
+configs/config.dev.yaml
+
+# Remotion 渲染模板旧快照（运行时由 backend/Dockerfile 从 frontend/eduvideo 构建产物注入）
+src/tasks/question_explanation_video_gen/video_synthesis/remotion_template/

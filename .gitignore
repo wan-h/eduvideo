@@ -1,0 +1,17 @@
+.DS_Store
+*.pyc
+*.log
+.pnpm-store
+.vscode
+.claude
+.cache
+
+# 本地环境变量（含密码/密钥）。仅保留公开模板与仅含公共变量的前端配置
+.env
+.env.*
+!**/.env.example
+!/frontend/eduvideo/.env
+!/frontend/eduvideo/.env.development
+
+# 运行时数据卷
+volumes/

@@ -1,0 +1,9 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "inputs": ["$TURBO_DEFAULT$", "!README.md", "!docs/**"],
+      "outputs": ["dist/**"]
+    }
+  }
+}

@@ -1,0 +1,22 @@
+# Server .dockerignore
+# 排除不需要打包的文件和目录
+
+# 依赖
+node_modules
+
+# 构建产物
+dist
+
+# 测试和临时文件
+test-output
+*.tsbuildinfo
+
+# 环境变量（绝不提交到镜像）
+.env
+.env.local
+
+# 操作系统文件
+.DS_Store
+
+# Git
+.git

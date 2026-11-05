@@ -1,0 +1,10 @@
+include:
+  - path: docker-compose-infra.yaml
+  - path: docker-compose-temporalio.yaml
+  - path: docker-compose-app.yaml
+  - path: docker-compose-nginx.yaml
+
+networks:
+  shared_network:
+    driver: bridge
+    internal: true

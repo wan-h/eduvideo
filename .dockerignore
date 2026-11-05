@@ -1,0 +1,35 @@
+# Repository-root Docker context (used by backend image builds).
+.git
+.gitignore
+.cache
+
+# Local environments, dependencies, and generated output.
+**/.venv
+**/node_modules
+**/__pycache__
+**/*.pyc
+**/*.log
+**/*.pid
+**/dist
+**/coverage
+**/test-output
+**/*.tsbuildinfo
+backend/logs
+backend/outputs
+backend/samples
+
+# 运行期数据卷（PostgreSQL / MinIO），不属于构建上下文
+volumes/
+
+# remotion_template/frontend 是前端 workspace 的旧快照(子模块)，镜像内由 frontend/eduvideo 源码重建；
+# 排除出构建上下文，避免 COPY backend/ 覆盖已安装/已构建的前端产物。
+backend/src/tasks/question_explanation_video_gen/video_synthesis/remotion_template/frontend
+
+# Never send local configuration or credentials to the Docker daemon.
+**/.env
+**/.env.*
+# 本地后端配置（含密钥）；镜像内使用 config.prod.yaml
+backend/configs/config.dev.yaml
+**/.DS_Store
+**/.idea
+**/.vscode

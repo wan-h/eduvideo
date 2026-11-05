@@ -1,0 +1,225 @@
+# ============================================================
+# 后端配置模板（本地开发）
+#
+# 使用方法:
+#   cp configs/config.example.yaml configs/config.dev.yaml
+#   两处 passwd 已预填本地开发默认值（与 docker/.env 保持一致），通常无需修改；
+#   复制后仅需补全标有「必填」的 api_key（同一厂商的 Key 可复用），即可启动
+#
+# 注意:
+#   * config.dev.yaml 已被 .gitignore 忽略，仅保留在本地，请勿提交
+#   * 预填的 passwd 仅为本地开发默认值，部署到任何对外环境请务必更换，
+#     或直接用环境变量 POSTGRES_PASSWORD / STORAGE_PASSWORD 覆盖
+#   * 敏感值（passwd / api_key）也可以留空，改由环境变量注入，优先级高于本文件:
+#       POSTGRES_PASSWORD / STORAGE_PASSWORD / LLM_<配置位置>_API_KEY ...
+#     变量清单见 docker/.env.example，覆盖逻辑见 src/utils/config_parser.py
+#   * SERVER_ENV 缺省为 dev，加载本文件复制出的 config.dev.yaml；
+#     容器部署固定 prod，加载 config.prod.yaml
+# ============================================================
+common:
+  name: "education-ai"
+  version: "v0.0.1"
+  log_level: "DEBUG"
+  env: "dev"
+  # 调用大模型时的图片传入方式: url(图片地址) | base64(data url，适用于大模型无法访问的本地 MinIO)
+  llm_image_input: "base64"
+middleware:
+  # 本段默认值与 docker/.env.example 保持一致，本机开发通常无需修改，
+  # 只需把两个 passwd 填成 docker/.env 中的对应密码
+  database:
+    # .env 的 POSTGRES_HOST=postgres 为容器内主机名；后端跑在宿主机时用 PgBouncer 的映射端口
+    host: "127.0.0.1"
+    # POSTGRES_PORT
+    port: "5432"
+    # PGUSER
+    user: "postgres"
+    # 本地开发默认值，与 docker/.env 的 POSTGRES_PASSWORD 保持一致；对外环境务必更换
+    passwd: "Eduvideo2026"
+    # POSTGRES_DB
+    db: "education-ai"
+  storage:
+    # PUBLIC_HOST + STORAGE_API_PORT + 桶名（宿主机直连 MinIO）
+    domain: "http://localhost:9000/eduvideo"
+    # 后端 S3 客户端地址；compose 容器内对应 STORAGE_HOST=http://minio:9000
+    host: "http://127.0.0.1:9000"
+    # 浏览器可达的预签名地址；compose 内由 PUBLIC_HOST + STORAGE_API_PORT 派生
+    public_host: "http://localhost:9000"
+    # STORAGE_ROOT_USER
+    user: "admin"
+    # 本地开发默认值，与 docker/.env 的 STORAGE_ROOT_PASSWORD 保持一致；对外环境务必更换
+    passwd: "Eduvideo2026"
+    # STORAGE_BUCKET
+    bucket: "eduvideo"
+  temporal:
+    # TEMPORAL_SERVER_PORT=7233 的宿主机映射；容器内对应 TEMPORAL_SERVER_HOST:7233
+    server_url: "127.0.0.1:7233"
+product:
+  eduvideo:
+    tts_clone:
+      base_url: "https://api.minimax.cn/v1/t2a_v2"
+      # 必填：MiniMax API Key（也可通过 LLM_TTS_CLONE_API_KEY 环境变量注入）
+      api_key: ""
+      model: "speech-2.8-turbo"
+      provider: "minimax"
+      limit: 2
+    agent_chat:
+      base_url: "https://api.deepseek.com"
+      # 必填：DeepSeek API Key（也可通过 LLM_AGENT_CHAT_API_KEY 环境变量注入）
+      api_key: ""
+      model: "deepseek-v4-flash"
+      history_limit: 10
+    magic_wand:
+      text_model:
+        base_url: "https://api.deepseek.com"
+        # 必填：DeepSeek API Key（也可通过 LLM_MAGIC_WAND_TEXT_API_KEY 环境变量注入）
+        api_key: ""
+        model: "deepseek-v4-flash"
+      image_model:
+        base_url: "https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation"
+        # 必填：阿里云百炼 API Key（也可通过 LLM_MAGIC_WAND_IMAGE_API_KEY 环境变量注入）
+        api_key: ""
+        model: "wan2.6-t2i"
+        edit_model: "wan2.6-image"
+        provider: "aliyun"
+    share_video_samples:
+      - title: "数学奥数题讲解"
+        url: "https://light4ai.space/education-ai/eduvideo/video-samples/%E6%95%B0%E5%AD%A6%E5%A5%A5%E6%95%B0%E9%A2%98%E8%AE%B2%E8%A7%A3.mp4"
+      - title: "生物选择题讲解"
+        url: "https://light4ai.space/education-ai/eduvideo/video-samples/%E7%94%9F%E7%89%A9%E9%80%89%E6%8B%A9%E9%A2%98%E8%AE%B2%E8%A7%A3.mp4"
+      - title: "化学选择题讲解"
+        url: "https://light4ai.space/education-ai/eduvideo/video-samples/%E5%8C%96%E5%AD%A6%E6%9C%89%E6%9C%BA%E7%89%A9%E9%80%89%E6%8B%A9%E9%A2%98.mp4"
+      - title: "数学英语讲解"
+        url: "https://light4ai.space/education-ai/eduvideo/video-samples/%E6%95%B0%E5%AD%A6%E8%8B%B1%E8%AF%AD%E8%AE%B2%E8%A7%A3.mp4"
+      - title: "物理解答题讲解"
+        url: "https://light4ai.space/education-ai/eduvideo/video-samples/%E7%89%A9%E7%90%86%E5%BC%B9%E7%B0%A7%E8%A7%A3%E7%AD%94%E9%A2%98.mp4"
+      - title: "生物选择题讲解"
+        url: "https://light4ai.space/education-ai/eduvideo/video-samples/%E7%94%9F%E7%89%A9%E9%80%89%E6%8B%A9%E9%A2%98%E8%AE%B2%E8%A7%A3.mp4"
+    voice_samples:
+      - title: "普通话女声"
+        model_id: "female-shaonv-jingpin"
+        url: "https://light4ai.space/education-ai/eduvideo/voice-samples/zh_female_putonghua.mp3"
+        voice_type: "zh_female_putonghua"
+        language: "chinese"
+      - title: "普通话男声"
+        model_id: "male-qn-jingying-jingpin"
+        url: "https://light4ai.space/education-ai/eduvideo/voice-samples/zh_male_putonghua.mp3"
+        voice_type: "zh_male_putonghua"
+        language: "chinese"
+      - title: "美英女声"
+        model_id: "English_CalmWoman"
+        url: "https://light4ai.space/education-ai/eduvideo/voice-samples/en_female_american.mp3"
+        voice_type: "en_female_american"
+        language: "english"
+      - title: "美英男声"
+        model_id: "English_Gentle-voiced_man"
+        url: "https://light4ai.space/education-ai/eduvideo/voice-samples/en_male_american.mp3"
+        voice_type: "en_male_american"
+        language: "english"
+      - title: "英英女声"
+        model_id: "English_Graceful_Lady"
+        url: "https://light4ai.space/education-ai/eduvideo/voice-samples/en_female_british.mp3"
+        voice_type: "en_female_british"
+        language: "english"
+      - title: "英英男声"
+        model_id: "English_Magnetic_Male_12"
+        url: "https://light4ai.space/education-ai/eduvideo/voice-samples/en_male_british.mp3"
+        voice_type: "en_male_british"
+        language: "english"
+tasks:
+  server_url: "http://127.0.0.1:8000"
+  base_task:
+    start_to_close_timeout: 3
+    task_queue: "base_task"
+    concurrency: 20
+  max_retries: 2
+  doc_parse:
+    start_to_close_timeout: 10
+    task_queue: "doc_parse"
+    concurrency: 1
+    mineru:
+      base_url: "https://mineru.net/api/v4"
+      # 必填：MinerU API Key（也可通过 LLM_DOC_PARSE_API_KEY 环境变量注入）
+      api_key: ""
+      model: "pipeline"
+      provider: "mineru"
+  question_extract:
+    start_to_close_timeout: 5
+    task_queue: "question_extract"
+    concurrency: 1
+    extractor:
+      base_url: "https://api.deepseek.com"
+      # 必填：DeepSeek API Key（也可通过 LLM_QUESTION_EXTRACT_API_KEY 环境变量注入）
+      api_key: ""
+      model: "deepseek-v4-flash"
+  readable_tts:
+    max_task_queue_activities_per_second: 0.2
+    start_to_close_timeout: 3
+    task_queue: "readable_tts"
+    fast_task_queue: "fast_readable_tts"
+    concurrency: 10
+    chinese_translate:
+      base_url: "https://api.deepseek.com"
+      # 必填：DeepSeek API Key（也可通过 LLM_READABLE_TTS_ZH_TRANSLATE_API_KEY 环境变量注入）
+      api_key: ""
+      model: "deepseek-v4-flash"
+    latex_translate:
+      base_url: "https://api.deepseek.com"
+      # 必填：DeepSeek API Key（也可通过 LLM_READABLE_TTS_LATEX_TRANSLATE_API_KEY 环境变量注入）
+      api_key: ""
+      model: "deepseek-v4-flash"
+    chinese:
+      base_url: "https://api.minimax.cn/v1/t2a_v2"
+      # 必填：MiniMax API Key（也可通过 LLM_READABLE_TTS_ZH_API_KEY 环境变量注入）
+      api_key: ""
+      model: "speech-2.8-turbo"
+      provider: "minimax"
+    english:
+      base_url: "https://api.minimax.cn/v1/t2a_v2"
+      # 必填：MiniMax API Key（也可通过 LLM_READABLE_TTS_EN_API_KEY 环境变量注入）
+      api_key: ""
+      model: "speech-2.8-turbo"
+      provider: "minimax"
+  question_explanation_video_gen_script:
+    start_to_close_timeout: 10
+    task_queue: "question_explanation_video_gen_script"
+    concurrency: 1
+    handout_generator:
+      base_url: "https://api.deepseek.com"
+      # 必填：DeepSeek API Key（也可通过 LLM_VIDEO_SCRIPT_HANDOUT_API_KEY 环境变量注入）
+      api_key: ""
+      model: deepseek-v4-flash
+    image_generator:
+      base_url: "https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation"
+      # 必填：阿里云百炼 API Key（也可通过 LLM_VIDEO_SCRIPT_IMAGE_API_KEY 环境变量注入）
+      api_key: ""
+      model: "wan2.6-t2i"
+      edit_model: "wan2.6-image"
+      provider: "aliyun"
+  question_explanation_video_gen_synthesis:
+    start_to_close_timeout: 20
+    task_queue: "question_explanation_video_gen_synthesis"
+    concurrency: 1
+    render_max_concurrency: 8
+    render_parallel_chunks: 4
+  question_solve:
+    start_to_close_timeout: 10
+    task_queue: "question_solve"
+    concurrency: 1
+    solver:
+      base_url: "https://api.deepseek.com"
+      # 必填：DeepSeek API Key（也可通过 LLM_QUESTION_SOLVE_API_KEY 环境变量注入）
+      api_key: ""
+      model: deepseek-v4-flash
+  question_parse:
+    start_to_close_timeout: 3
+    task_queue: "question_parse"
+    concurrency: 1
+    parser:
+      base_url: "https://api.deepseek.com"
+      # 必填：DeepSeek API Key（也可通过 LLM_QUESTION_PARSE_API_KEY 环境变量注入）
+      api_key: ""
+      model: deepseek-v4-flash
+
+server:
+  ip: "0.0.0.0"
+  port: 8000

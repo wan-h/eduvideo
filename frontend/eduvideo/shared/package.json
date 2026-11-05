@@ -1,0 +1,49 @@
+{
+  "name": "@ask2vid/shared",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "tsup && node strip-css-imports.mjs",
+    "format": "prettier --write \"**/*.{ts,tsx}\"",
+    "typecheck": "tsc --noEmit",
+    "dev": "tsup --watch"
+  },
+  "peerDependencies": {
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "remotion": "catalog:"
+  },
+  "dependencies": {
+    "@remotion/fonts": "catalog:",
+    "@remotion/google-fonts": "catalog:",
+    "@remotion/layout-utils": "catalog:",
+    "@remotion/media": "catalog:",
+    "@remotion/media-parser": "catalog:",
+    "katex": "catalog:",
+    "react-markdown": "^10.1.0",
+    "rehype-katex": "^7.0.1",
+    "rehype-raw": "^7.0.0",
+    "remark-gfm": "^4.0.1",
+    "remark-math": "^6.0.0",
+    "uuid": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "prettier": "^3.9.4",
+    "tsup": "^8.5.1",
+    "typescript": "catalog:"
+  }
+}

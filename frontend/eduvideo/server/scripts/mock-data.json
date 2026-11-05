@@ -1,0 +1,235 @@
+{
+    "question_content": {
+      "stem": "定义离心率是 $\\frac{\\sqrt{5} - 1}{2}$ 的椭圆为“黄金椭圆”。已知椭圆 $E: \\frac{x^2}{10} + \\frac{y^2}{m} = 1 (10 > m > 0)$ 是“黄金椭圆”，则 $m =$ \\_\\_\\_\\_，若“黄金椭圆” $C: \\frac{x^2}{a^2} + \\frac{y^2}{b^2} = 1 (a > b > 0)$ 两个焦点分别为 $F_1(-c, 0)$ 、 $F_2(c, 0)(c > 0)$ ， $P$ 为椭圆 $C$ 上的异于顶点的任意一点，点 $M$ 是 $\\triangle PF_1F_2$ 的内心，连接 $PM$ 并延长交 $F_1F_2$ 于点 $N$ ，则 $\\frac{|PM|}{|MN|} =$ \\_\\_\\_\\_.",
+      "options": []
+    },
+    "question_metadata": {
+      "title": "黄金椭圆离心率问题",
+      "type": "answer_question",
+      "level": "normal",
+      "subject": "math",
+      "stage": "senior",
+      "language": "chinese",
+      "voice": "zh_male_putonghua",
+      "knowledge_points": [
+        "黄金椭圆",
+        "离心率",
+        "椭圆性质"
+      ],
+      "video_synthesis_template_id": null
+    },
+    "scenes": {
+      "question_introduction": {
+        "stem": "定义离心率是 $\\frac{\\sqrt{5} - 1}{2}$ 的椭圆为“黄金椭圆”。已知椭圆 $E: \\frac{x^2}{10} + \\frac{y^2}{m} = 1 (10 > m > 0)$ 是“黄金椭圆”，则 $m =$ \\_\\_\\_\\_，若“黄金椭圆” $C: \\frac{x^2}{a^2} + \\frac{y^2}{b^2} = 1 (a > b > 0)$ 两个焦点分别为 $F_1(-c, 0)$ 、 $F_2(c, 0)(c > 0)$ ， $P$ 为椭圆 $C$ 上的异于顶点的任意一点，点 $M$ 是 $\\triangle PF_1F_2$ 的内心，连接 $PM$ 并延长交 $F_1F_2$ 于点 $N$ ，则 $\\frac{|PM|}{|MN|} =$ \\_\\_\\_\\_.",
+        "options": [],
+        "subtitles": [
+          {
+            "text": "同学们好，今天我们来看一道定义新颖的解析几何题，它将椭圆与黄金分割联系起来，要求我们求解两个与黄金椭圆相关的值。",
+            "audio": "http://127.0.0.1:9000/eduvideo/education-ai/users/0c775bb2-6aae-4ad1-b8a1-4575dc2191ae/100caabc-2120-42b6-bcf3-0ab88b270715/question_explanation_video_gen_script_2f6db485-3f5b-47a3-80b0-20c802ded697_readable_tts_bdb827a1-6a0b-421e-9a32-71839079ca08.mp3",
+            "duration": 11297
+          }
+        ]
+      },
+      "question_solution": {
+        "segments": [
+          {
+            "title": "",
+            "content": "下面我们分两步来解决这道题。",
+            "subtitles": [
+              {
+                "text": "好，我们先来解决第一个问题，求参数M的值。",
+                "audio": "http://127.0.0.1:9000/eduvideo/education-ai/users/0c775bb2-6aae-4ad1-b8a1-4575dc2191ae/100caabc-2120-42b6-bcf3-0ab88b270715/question_explanation_video_gen_script_2f6db485-3f5b-47a3-80b0-20c802ded697_readable_tts_87460679-1f17-4fd2-8dea-7c63bfbb90a0.mp3",
+                "duration": 4300
+              }
+            ]
+          },
+          {
+            "title": "第一空：求解参数m",
+            "content": "对于椭圆 $E: \\frac{x^2}{10} + \\frac{y^2}{m} = 1$，有：$a^2 = 10, b^2 = m \\implies c^2 = a^2 - b^2 = 10 - m$离心率 $e^2 = \\frac{c^2}{a^2} = \\frac{10-m}{10}$",
+            "subtitles": [
+              {
+                "text": "首先根据椭圆的标准方程，我们写出A平方、B平方和C平方的表达式，进而得到离心率的平方与M的关系式。",
+                "audio": "http://127.0.0.1:9000/eduvideo/education-ai/users/0c775bb2-6aae-4ad1-b8a1-4575dc2191ae/100caabc-2120-42b6-bcf3-0ab88b270715/question_explanation_video_gen_script_2f6db485-3f5b-47a3-80b0-20c802ded697_readable_tts_963e8769-5fa7-4c9b-bd73-05627a58a7cf.mp3",
+                "duration": 10194
+              }
+            ]
+          },
+          {
+            "title": "利用“黄金椭圆”定义建立等式",
+            "content": "根据定义，$e = \\frac{\\sqrt{5} - 1}{2}$，则$e^2 = (\\frac{\\sqrt{5} - 1}{2})^2 = \\frac{6 - 2\\sqrt{5}}{4} = \\frac{3 - \\sqrt{5}}{2}$所以，$\\frac{10-m}{10} = \\frac{3 - \\sqrt{5}}{2}$",
+            "subtitles": [
+              {
+                "text": "然后，我们利用题目给的“黄金椭圆”的定义，计算出这个特殊离心率的平方。",
+                "audio": "http://127.0.0.1:9000/eduvideo/education-ai/users/0c775bb2-6aae-4ad1-b8a1-4575dc2191ae/100caabc-2120-42b6-bcf3-0ab88b270715/question_explanation_video_gen_script_2f6db485-3f5b-47a3-80b0-20c802ded697_readable_tts_ef535812-77c4-4f91-b405-b985f3fff20c.mp3",
+                "duration": 6049
+              },
+              {
+                "text": "这样我们就得到了一个关于M的方程。",
+                "audio": "http://127.0.0.1:9000/eduvideo/education-ai/users/0c775bb2-6aae-4ad1-b8a1-4575dc2191ae/100caabc-2120-42b6-bcf3-0ab88b270715/question_explanation_video_gen_script_2f6db485-3f5b-47a3-80b0-20c802ded697_readable_tts_3e15055a-728c-497e-9eb0-56b46bba3da0.mp3",
+                "duration": 2856
+              }
+            ]
+          },
+          {
+            "title": "解方程求得m",
+            "content": "$10-m = 5(3-\\sqrt{5}) = 15 - 5\\sqrt{5}$$m = 5\\sqrt{5} - 5$",
+            "subtitles": [
+              {
+                "text": "简单解这个方程，就能得到M的值，第一空就完成了。",
+                "audio": "http://127.0.0.1:9000/eduvideo/education-ai/users/0c775bb2-6aae-4ad1-b8a1-4575dc2191ae/100caabc-2120-42b6-bcf3-0ab88b270715/question_explanation_video_gen_script_2f6db485-3f5b-47a3-80b0-20c802ded697_readable_tts_75ce75ee-9b3c-49e8-a3df-7eb50629bd1a.mp3",
+                "duration": 4389
+              }
+            ]
+          },
+          {
+            "title": "第二空：分析几何关系",
+            "content": "在 $\\triangle PF_1F_2$ 中，点 $M$ 是其**内心**，因此 $PN$ 是 $\\angle F_1PF_2$ 的**角平分线**。",
+            "subtitles": [
+              {
+                "text": "接下来我们看二空，解题的关键在于识别点M作为内心的几何意义，这意味着PM所在的直线PN是顶角F1PF2的角平分线。",
+                "audio": "http://127.0.0.1:9000/eduvideo/education-ai/users/0c775bb2-6aae-4ad1-b8a1-4575dc2191ae/100caabc-2120-42b6-bcf3-0ab88b270715/question_explanation_video_gen_script_2f6db485-3f5b-47a3-80b0-20c802ded697_readable_tts_7e0c8372-5011-484b-9dc3-c7a53587e59b.mp3",
+                "duration": 11726
+              }
+            ]
+          },
+          {
+            "title": "应用角平分线定理",
+            "content": "根据三角形角平分线定理，有：$\\frac{|PM|}{|MN|} = \\frac{|PF_1| + |PF_2|}{|F_1F_2|}$",
+            "subtitles": [
+              {
+                "text": "既然是角平分线，我们就可以直接使用角平分线定理的推论，把要求的线段比，转化成焦点三角形三条边长的关系。",
+                "audio": "http://127.0.0.1:9000/eduvideo/education-ai/users/0c775bb2-6aae-4ad1-b8a1-4575dc2191ae/100caabc-2120-42b6-bcf3-0ab88b270715/question_explanation_video_gen_script_2f6db485-3f5b-47a3-80b0-20c802ded697_readable_tts_2eb3be46-6723-491a-b161-116cc2cfb6a6.mp3",
+                "duration": 9800
+              }
+            ]
+          },
+          {
+            "title": "结合椭圆定义转化比值",
+            "content": "由椭圆定义可知：$|PF_1|+|PF_2| = 2a$ ，$|F_1F_2|=2c$。代入得：$\\frac{|PM|}{|MN|} = \\frac{2a}{2c} = \\frac{a}{c} = \\frac{1}{e}$",
+            "subtitles": [
+              {
+                "text": "这个比例式的分子和分母，恰好能用椭圆的定义和焦距来表示，也就是二A和二C。",
+                "audio": "http://127.0.0.1:9000/eduvideo/education-ai/users/0c775bb2-6aae-4ad1-b8a1-4575dc2191ae/100caabc-2120-42b6-bcf3-0ab88b270715/question_explanation_video_gen_script_2f6db485-3f5b-47a3-80b0-20c802ded697_readable_tts_a27332e4-8f40-4786-bc83-d552d5b23667.mp3",
+                "duration": 7700
+              },
+              {
+                "text": "这样一来，问题就豁然开朗了，这个比值就是离心率的倒数。",
+                "audio": "http://127.0.0.1:9000/eduvideo/education-ai/users/0c775bb2-6aae-4ad1-b8a1-4575dc2191ae/100caabc-2120-42b6-bcf3-0ab88b270715/question_explanation_video_gen_script_2f6db485-3f5b-47a3-80b0-20c802ded697_readable_tts_8a37db7c-f413-45fa-a036-0aec3c2b5058.mp3",
+                "duration": 5500
+              }
+            ]
+          },
+          {
+            "title": "代入“黄金椭圆”离心率求解",
+            "content": "$\\frac{|PM|}{|MN|} = \\frac{1}{\\frac{\\sqrt{5}-1}{2}} = \\frac{2}{\\sqrt{5}-1} = \\frac{2(\\sqrt{5}+1)}{(\\sqrt{5}-1)(\\sqrt{5}+1)} = \\frac{\\sqrt{5}+1}{2}$",
+            "subtitles": [
+              {
+                "text": "题目已经指明这是黄金椭圆，我们代入给定的离心率，然后对分母进行有理化，就能得到最终结果。",
+                "audio": "http://127.0.0.1:9000/eduvideo/education-ai/users/0c775bb2-6aae-4ad1-b8a1-4575dc2191ae/100caabc-2120-42b6-bcf3-0ab88b270715/question_explanation_video_gen_script_2f6db485-3f5b-47a3-80b0-20c802ded697_readable_tts_4c912998-f3df-475b-a027-395cd794a96c.mp3",
+                "duration": 8700
+              }
+            ]
+          },
+          {
+            "title": "",
+            "content": "最终答案为：$5\\sqrt{5}-5$；$\\frac{\\sqrt{5}+1}{2}$",
+            "subtitles": [
+              {
+                "text": "这样我们就得到了两个空的答案，下面我们来总结一下这道题的要点。",
+                "audio": "http://127.0.0.1:9000/eduvideo/education-ai/users/0c775bb2-6aae-4ad1-b8a1-4575dc2191ae/100caabc-2120-42b6-bcf3-0ab88b270715/question_explanation_video_gen_script_2f6db485-3f5b-47a3-80b0-20c802ded697_readable_tts_e1ad908e-fec2-45f3-a491-79d1bfc668d6.mp3",
+                "duration": 5900
+              }
+            ]
+          }
+        ]
+      },
+      "question_key_points": {
+        "segments": [
+          {
+            "title": "",
+            "content": "回顾与总结",
+            "subtitles": [
+              {
+                "text": "这道题巧妙地融合了代数计算与几何性质，我们来梳理一下其中的核心思路。",
+                "audio": "http://127.0.0.1:9000/eduvideo/education-ai/users/0c775bb2-6aae-4ad1-b8a1-4575dc2191ae/100caabc-2120-42b6-bcf3-0ab88b270715/question_explanation_video_gen_script_2f6db485-3f5b-47a3-80b0-20c802ded697_readable_tts_38d24b2b-038c-419b-8dc3-bee92e5eb4a8.mp3",
+                "duration": 6478
+              }
+            ]
+          },
+          {
+            "title": "",
+            "content": "| 知识点/方法 | 在题目中的应用 || :--- | :--- || **椭圆基本量关系** | 第一空，通过 $a^2, b^2, c^2$ 的关系，建立 $m$ 与 $e$ 的方程。 || **新定义问题处理** | 将“黄金椭圆”的文字定义，精准翻译成数学条件 $e = \\frac{\\sqrt{5}-1}{2}$。 || **三角形内心性质** | 第二空，识别出 $M$ 为内心是解题的突破口，引出角平分线。 || **角平分线定理** | 将要求的线段比 $\\frac{|PM|}{|MN|}$ 转化为边长关系 $\\frac{|PF_1|+|PF_2|}{|F_1F_2|}$。 || **数形结合思想** | 将几何问题（线段比）与代数问题（椭圆参数 $a,c,e$）进行无缝转化。 |",
+            "subtitles": [
+              {
+                "text": "我们来看这个表格。",
+                "audio": "http://127.0.0.1:9000/eduvideo/education-ai/users/0c775bb2-6aae-4ad1-b8a1-4575dc2191ae/100caabc-2120-42b6-bcf3-0ab88b270715/question_explanation_video_gen_script_2f6db485-3f5b-47a3-80b0-20c802ded697_readable_tts_9200245c-b5c5-4fe0-9902-bd1e14463b9f.mp3",
+                "duration": 1800
+              },
+              {
+                "text": "首先，我们必须熟练掌握椭圆中A，B，C和离心率E之间的关系，这是第一问的基础。",
+                "audio": "http://127.0.0.1:9000/eduvideo/education-ai/users/0c775bb2-6aae-4ad1-b8a1-4575dc2191ae/100caabc-2120-42b6-bcf3-0ab88b270715/question_explanation_video_gen_script_2f6db485-3f5b-47a3-80b0-20c802ded697_readable_tts_c8d3ee4c-0026-48a1-b0e4-b00c0dafef4e.mp3",
+                "duration": 7082
+              },
+              {
+                "text": "其次，面对“黄金椭圆”这样的新定义，要做的就是把它翻译成我们熟悉的数学语言。",
+                "audio": "http://127.0.0.1:9000/eduvideo/education-ai/users/0c775bb2-6aae-4ad1-b8a1-4575dc2191ae/100caabc-2120-42b6-bcf3-0ab88b270715/question_explanation_video_gen_script_2f6db485-3f5b-47a3-80b0-20c802ded697_readable_tts_d1245784-bbe2-43f1-8c80-582003a21bb6.mp3",
+                "duration": 7200
+              },
+              {
+                "text": "对于二问，关键是识别出内心这个几何条件，并迅速联想到角平分线定理，这是典型的数形结合。",
+                "audio": "http://127.0.0.1:9000/eduvideo/education-ai/users/0c775bb2-6aae-4ad1-b8a1-4575dc2191ae/100caabc-2120-42b6-bcf3-0ab88b270715/question_explanation_video_gen_script_2f6db485-3f5b-47a3-80b0-20c802ded697_readable_tts_2d4d56ab-a0d5-41e1-8b51-e29297b1abaf.mp3",
+                "duration": 9300
+              },
+              {
+                "text": "最后，将几何关系转化回椭圆的参数A和C，问题就迎刃而解了。",
+                "audio": "http://127.0.0.1:9000/eduvideo/education-ai/users/0c775bb2-6aae-4ad1-b8a1-4575dc2191ae/100caabc-2120-42b6-bcf3-0ab88b270715/question_explanation_video_gen_script_2f6db485-3f5b-47a3-80b0-20c802ded697_readable_tts_7df43177-57a4-4cff-98b6-9bc0ebb83b78.mp3",
+                "duration": 6269
+              }
+            ]
+          },
+          {
+            "title": "",
+            "content": "从“黄金椭圆”到“黄金分割”，数学之美在于联通。",
+            "subtitles": [
+              {
+                "text": "大家可以看到，一个看似复杂的几何问题，通过层层转化，最终归结为了椭圆最核心的定义和性质。",
+                "audio": "http://127.0.0.1:9000/eduvideo/education-ai/users/0c775bb2-6aae-4ad1-b8a1-4575dc2191ae/100caabc-2120-42b6-bcf3-0ab88b270715/question_explanation_video_gen_script_2f6db485-3f5b-47a3-80b0-20c802ded697_readable_tts_75670746-ef09-4282-a6ba-9a0827f4eed9.mp3",
+                "duration": 8870
+              },
+              {
+                "text": "这道题也启发我们，在面对新定义问题时，不要畏惧，其本质往往是我们熟悉的知识。",
+                "audio": "http://127.0.0.1:9000/eduvideo/education-ai/users/0c775bb2-6aae-4ad1-b8a1-4575dc2191ae/100caabc-2120-42b6-bcf3-0ab88b270715/question_explanation_video_gen_script_2f6db485-3f5b-47a3-80b0-20c802ded697_readable_tts_13476443-4144-48a1-8a0d-3d767aa2f250.mp3",
+                "duration": 7755
+              },
+              {
+                "text": "而从离心率的二分之根号五减一，到我们算出的比值二分之根号五加一，这两个共轭的无理数，正是黄金分割比的体现，这充分展现了数学不同分支之间的深刻联系和和谐之美。",
+                "audio": "http://127.0.0.1:9000/eduvideo/education-ai/users/0c775bb2-6aae-4ad1-b8a1-4575dc2191ae/100caabc-2120-42b6-bcf3-0ab88b270715/question_explanation_video_gen_script_2f6db485-3f5b-47a3-80b0-20c802ded697_readable_tts_ed1ac908-c687-4bae-9e90-4a216cc5aee3.mp3",
+                "duration": 15778
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "steps": {
+      "question_extract": null,
+      "question_parse": {
+        "title": "黄金椭圆离心率问题",
+        "question_type": "answer_question",
+        "question_content": {
+          "stem": "定义离心率是 $\\frac{\\sqrt{5} - 1}{2}$ 的椭圆为“黄金椭圆”。已知椭圆 $E: \\frac{x^2}{10} + \\frac{y^2}{m} = 1 (10 > m > 0)$ 是“黄金椭圆”，则 $m =$ \\_\\_\\_\\_，若“黄金椭圆” $C: \\frac{x^2}{a^2} + \\frac{y^2}{b^2} = 1 (a > b > 0)$ 两个焦点分别为 $F_1(-c, 0)$ 、 $F_2(c, 0)(c > 0)$ ， $P$ 为椭圆 $C$ 上的异于顶点的任意一点，点 $M$ 是 $\\triangle PF_1F_2$ 的内心，连接 $PM$ 并延长交 $F_1F_2$ 于点 $N$ ，则 $\\frac{|PM|}{|MN|} =$ \\_\\_\\_\\_.",
+          "options": []
+        },
+        "subject": "math",
+        "knowledge_points": [
+          "黄金椭圆",
+          "离心率",
+          "椭圆性质"
+        ]
+      },
+      "question_solve": {
+        "level": "normal",
+        "solution": "### 解答过程 **第一空：** 根据椭圆方程 $E: \\frac{x^2}{10} + \\frac{y^2}{m} = 1 (10 > m > 0)$，我们可以得到：$a^2 = 10$，所以 $a = \\sqrt{10}$$b^2 = m$$c^2 = a^2 - b^2 = 10 - m$椭圆的离心率 $e$ 的计算公式为 $e = \\frac{c}{a}$，所以：$e^2 = \\frac{c^2}{a^2} = \\frac{10 - m}{10}$根据“黄金椭圆”的定义，其离心率 $e = \\frac{\\sqrt{5} - 1}{2}$。所以，$e^2 = \\left(\\frac{\\sqrt{5} - 1}{2}\\right)^2 = \\frac{5 - 2\\sqrt{5} + 1}{4} = \\frac{6 - 2\\sqrt{5}}{4} = \\frac{3 - \\sqrt{5}}{2}$。联立两个关于 $e^2$ 的表达式，我们得到：$\\frac{10 - m}{10} = \\frac{3 - \\sqrt{5}}{2}$$2(10 - m) = 10(3 - \\sqrt{5})$$10 - m = 5(3 - \\sqrt{5})$$10 - m = 15 - 5\\sqrt{5}$$m = 10 - (15 - 5\\sqrt{5})$$m = 5\\sqrt{5} - 5$**第二空：**在 $\\triangle PF_1F_2$ 中，点 $M$ 是其内心，根据三角形内心的性质，连接顶点与内心的直线平分该顶点对应的角。因此，$PN$ 是 $\\angle F_1PF_2$ 的角平分线。根据三角形角平分线定理的推论，内心 $M$ 在角平分线 $PN$ 上的位置满足以下比例关系：$\\frac{|PM|}{|MN|} = \\frac{|PF_1| + |PF_2|}{|F_1F_2|}$根据椭圆的定义，椭圆上的任意一点 $P$ 到两个焦点 $F_1, F_2$ 的距离之和为常数 $2a$。即 $|PF_1| + |PF_2| = 2a$。两个焦点之间的距离为 $|F_1F_2| = 2c$。将这两个关系代入上述比例式中，得到：$\\frac{|PM|}{|MN|} = \\frac{2a}{2c} = \\frac{a}{c}$这个比值是椭圆离心率 $e = \\frac{c}{a}$ 的倒数。$\\frac{|PM|}{|MN|} = \\frac{1}{e}$因为该椭圆是“黄金椭圆”，其离心率 $e = \\frac{\\sqrt{5} - 1}{2}$。所以：$\\frac{|PM|}{|MN|} = \\frac{1}{\\frac{\\sqrt{5} - 1}{2}} = \\frac{2}{\\sqrt{5} - 1}$对分母进行有理化：$\\frac{2}{\\sqrt{5} - 1} = \\frac{2(\\sqrt{5} + 1)}{(\\sqrt{5} - 1)(\\sqrt{5} + 1)} = \\frac{2(\\sqrt{5} + 1)}{5 - 1} = \\frac{2(\\sqrt{5} + 1)}{4} = \\frac{\\sqrt{5} + 1}{2}$### 最终答案$5\\sqrt{5} - 5$; $\\frac{\\sqrt{5} + 1}{2}$"
+      }
+    }
+}

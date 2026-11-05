@@ -1,0 +1,38 @@
+# ── Python ──
+.git
+.venv
+__pycache__
+logs
+samples
+outputs
+*.log
+*.pid
+
+# ── Remotion 子模块: 排除不必要文件，依赖由 node-builder 阶段安装 ──
+# node_modules (由 node-builder 阶段 pnpm install 产生)
+src/tasks/question_explanation_video_gen/video_synthesis/remotion_template/frontend/node_modules
+src/tasks/question_explanation_video_gen/video_synthesis/remotion_template/frontend/server/node_modules
+src/tasks/question_explanation_video_gen/video_synthesis/remotion_template/frontend/shared/node_modules
+
+# git 元数据
+src/tasks/question_explanation_video_gen/video_synthesis/remotion_template/.git
+src/tasks/question_explanation_video_gen/video_synthesis/remotion_template/.agents
+src/tasks/question_explanation_video_gen/video_synthesis/remotion_template/.claude
+
+# 前端 UI 源码 (渲染只需 server/ 和 shared/，不需要前端页面)
+src/tasks/question_explanation_video_gen/video_synthesis/remotion_template/frontend/src
+src/tasks/question_explanation_video_gen/video_synthesis/remotion_template/frontend/public
+src/tasks/question_explanation_video_gen/video_synthesis/remotion_template/frontend/index.html
+src/tasks/question_explanation_video_gen/video_synthesis/remotion_template/frontend/vite.config.ts
+src/tasks/question_explanation_video_gen/video_synthesis/remotion_template/frontend/components.json
+
+# 文档和 IDE 配置
+src/tasks/question_explanation_video_gen/video_synthesis/remotion_template/frontend/docs
+src/tasks/question_explanation_video_gen/video_synthesis/remotion_template/frontend/.vscode
+src/tasks/question_explanation_video_gen/video_synthesis/remotion_template/frontend/.wolf
+src/tasks/question_explanation_video_gen/video_synthesis/remotion_template/frontend/.codegraph
+src/tasks/question_explanation_video_gen/video_synthesis/remotion_template/frontend/.ast-grep
+src/tasks/question_explanation_video_gen/video_synthesis/remotion_template/frontend/*.md
+src/tasks/question_explanation_video_gen/video_synthesis/remotion_template/frontend/.mcp.json
+src/tasks/question_explanation_video_gen/video_synthesis/remotion_template/frontend/.env
+src/tasks/question_explanation_video_gen/video_synthesis/remotion_template/frontend/deploy

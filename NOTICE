@@ -1,0 +1,37 @@
+EduVideo
+Copyright 2026 wan-h
+
+Project home: https://github.com/wan-h/eduvideo
+
+This product includes software developed by wan-h and the EduVideo
+contributors at https://github.com/wan-h/eduvideo.
+
+--------------------------------------------------------------------------------
+Attribution requirement 署名要求
+--------------------------------------------------------------------------------
+
+Any redistribution of this software, in source or object form, with or
+without modification, MUST retain this NOTICE file and MUST clearly credit
+the original project in the accompanying documentation, "about" page, or
+any other place where third-party notices normally appear:
+
+    EduVideo - https://github.com/wan-h/eduvideo
+
+Modified files MUST carry prominent notices stating that they were changed.
+
+This requirement is enforced by the Apache License, Version 2.0,
+sections 4(b) and 4(d). The contents of this NOTICE file are for
+informational purposes only and do not modify the License.
+
+--------------------------------------------------------------------------------
+
+任何形式的转载、镜像、分发或衍生发布（无论是否修改），均须保留本 NOTICE
+文件，并在文档、产品「关于」页或通常展示第三方声明的位置，以可读形式注明
+原始出处：
+
+    EduVideo - https://github.com/wan-h/eduvideo
+
+对源码的任何修改，须在对应文件中显著标明「已被修改」。
+
+该要求由 Apache License 2.0 第 4(b)、4(d) 条保障。本文件内容仅供参考，
+不构成对许可证的修改。
