@@ -33,6 +33,7 @@ EduVideo 是面向教学场景的「题目讲解视频」生成平台。老师�
 
 ## 演示视频
 
+https://github.com/user-attachments/assets/2e20719e-2fbd-4dbd-aca3-352297ab131e
 
 ## 产品截图
 
