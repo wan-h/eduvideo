@@ -35,12 +35,12 @@ product:
     agent_chat:
       base_url: "https://api.deepseek.com"
       api_key: ""
-      model: "deepseek-v4-flash"
+      model: "deepseek-flash"
     magic_wand:
       text_model:
         base_url: "https://api.deepseek.com"
         api_key: ""
-        model: "deepseek-v4-flash"
+        model: "deepseek-flash"
       image_model:
         base_url: "https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation"
         api_key: ""
@@ -123,7 +123,7 @@ tasks:
     extractor:
       base_url: "https://api.deepseek.com"
       api_key: ""
-      model: "deepseek-v4-flash"
+      model: "deepseek-flash"
   readable_tts:
     max_task_queue_activities_per_second: 0.2
     start_to_close_timeout: 3
@@ -133,11 +133,11 @@ tasks:
     chinese_translate:
       base_url: "https://api.deepseek.com"
       api_key: ""
-      model: "deepseek-v4-flash"
+      model: "deepseek-flash"
     latex_translate:
       base_url: "https://api.deepseek.com"
       api_key: ""
-      model: "deepseek-v4-flash"
+      model: "deepseek-flash"
     chinese:
       base_url: "https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation"
       api_key: ""
@@ -155,7 +155,7 @@ tasks:
     handout_generator:
       base_url: "https://api.deepseek.com"
       api_key: ""
-      model: deepseek-v4-flash
+      model: deepseek-flash
     image_generator:
       base_url: "https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation"
       api_key: ""
@@ -176,7 +176,7 @@ tasks:
     solver:
       base_url: "https://api.deepseek.com"
       api_key: ""
-      model: deepseek-v4-flash
+      model: deepseek-flash
   question_parse:
     start_to_close_timeout: 3
     task_queue: "question_parse"
@@ -184,7 +184,7 @@ tasks:
     parser:
       base_url: "https://api.deepseek.com"
       api_key: ""
-      model: deepseek-v4-flash
+      model: deepseek-flash
 
 server:
   ip: "0.0.0.0"

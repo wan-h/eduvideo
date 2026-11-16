@@ -66,14 +66,14 @@ product:
       base_url: "https://api.deepseek.com"
       # 必填：DeepSeek API Key（也可通过 LLM_AGENT_CHAT_API_KEY 环境变量注入）
       api_key: ""
-      model: "deepseek-v4-flash"
+      model: "deepseek-flash"
       history_limit: 10
     magic_wand:
       text_model:
         base_url: "https://api.deepseek.com"
         # 必填：DeepSeek API Key（也可通过 LLM_MAGIC_WAND_TEXT_API_KEY 环境变量注入）
         api_key: ""
-        model: "deepseek-v4-flash"
+        model: "deepseek-flash"
       image_model:
         base_url: "https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation"
         # 必填：阿里云百炼 API Key（也可通过 LLM_MAGIC_WAND_IMAGE_API_KEY 环境变量注入）
@@ -150,7 +150,7 @@ tasks:
       base_url: "https://api.deepseek.com"
       # 必填：DeepSeek API Key（也可通过 LLM_QUESTION_EXTRACT_API_KEY 环境变量注入）
       api_key: ""
-      model: "deepseek-v4-flash"
+      model: "deepseek-flash"
   readable_tts:
     max_task_queue_activities_per_second: 0.2
     start_to_close_timeout: 3
@@ -161,12 +161,12 @@ tasks:
       base_url: "https://api.deepseek.com"
       # 必填：DeepSeek API Key（也可通过 LLM_READABLE_TTS_ZH_TRANSLATE_API_KEY 环境变量注入）
       api_key: ""
-      model: "deepseek-v4-flash"
+      model: "deepseek-flash"
     latex_translate:
       base_url: "https://api.deepseek.com"
       # 必填：DeepSeek API Key（也可通过 LLM_READABLE_TTS_LATEX_TRANSLATE_API_KEY 环境变量注入）
       api_key: ""
-      model: "deepseek-v4-flash"
+      model: "deepseek-flash"
     chinese:
       base_url: "https://api.minimax.cn/v1/t2a_v2"
       # 必填：MiniMax API Key（也可通过 LLM_READABLE_TTS_ZH_API_KEY 环境变量注入）
@@ -187,7 +187,7 @@ tasks:
       base_url: "https://api.deepseek.com"
       # 必填：DeepSeek API Key（也可通过 LLM_VIDEO_SCRIPT_HANDOUT_API_KEY 环境变量注入）
       api_key: ""
-      model: deepseek-v4-flash
+      model: deepseek-flash
     image_generator:
       base_url: "https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation"
       # 必填：阿里云百炼 API Key（也可通过 LLM_VIDEO_SCRIPT_IMAGE_API_KEY 环境变量注入）
@@ -209,7 +209,7 @@ tasks:
       base_url: "https://api.deepseek.com"
       # 必填：DeepSeek API Key（也可通过 LLM_QUESTION_SOLVE_API_KEY 环境变量注入）
       api_key: ""
-      model: deepseek-v4-flash
+      model: deepseek-flash
   question_parse:
     start_to_close_timeout: 3
     task_queue: "question_parse"
@@ -218,7 +218,7 @@ tasks:
       base_url: "https://api.deepseek.com"
       # 必填：DeepSeek API Key（也可通过 LLM_QUESTION_PARSE_API_KEY 环境变量注入）
       api_key: ""
-      model: deepseek-v4-flash
+      model: deepseek-flash
 
 server:
   ip: "0.0.0.0"
