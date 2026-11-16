@@ -93,3 +93,42 @@ def test_preload_remote_assets_reads_own_storage_from_s3(tmp_path):
         assert result["scenes"]["question_solution"]["segments"][0]["subtitles"][0]["audio"] == local_url
 
     asyncio.run(_impl())
+
+
+def test_preload_remote_assets_localizes_markdown_images(tmp_path):
+    """题干、选项与讲解正文中的 markdown/HTML 图片必须预下载并替换为本地资源服务 URL"""
+
+    async def _impl():
+        img_url = f"{config.middleware.storage.domain}/education-ai/users/u1/public/a.png"
+        option_img_url = f"{config.middleware.storage.domain}/education-ai/users/u1/public/b.png"
+        input_dict = {
+            "scenes": {
+                "question_introduction": {
+                    "stem": f"题图 ![示意图]({img_url})",
+                    "options": [f'<img src="{option_img_url}" alt="选项图">'],
+                    "subtitles": [],
+                },
+                "question_solution": {"segments": [{"content": f"正文 ![]({img_url})", "subtitles": []}]},
+                "question_key_points": {"segments": []},
+            },
+            "video_settings": {},
+        }
+
+        with (
+            patch.object(video_synthesis_activities, "download_file", new_callable=AsyncMock) as mock_download,
+            patch("httpx.AsyncClient.get", new_callable=AsyncMock) as mock_get,
+        ):
+            mock_download.return_value = FileDesc(
+                content=b"png", s3_url=img_url, filename="a.png", content_type="image/png"
+            )
+            result = await video_synthesis_activities._preload_remote_assets(input_dict, str(tmp_path), 4321)
+
+        # 图片 URL 全部走内网 S3，未发起 HTTP 请求；重复引用的同一 URL 只下载一次
+        mock_get.assert_not_awaited()
+        assert mock_download.await_count == 2
+        intro = result["scenes"]["question_introduction"]
+        assert "127.0.0.1:4321/asset_" in intro["stem"]
+        assert "127.0.0.1:4321/asset_" in intro["options"][0]
+        assert "127.0.0.1:4321/asset_" in result["scenes"]["question_solution"]["segments"][0]["content"]
+
+    asyncio.run(_impl())

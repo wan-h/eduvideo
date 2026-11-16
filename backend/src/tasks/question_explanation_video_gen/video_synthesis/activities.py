@@ -2,8 +2,10 @@ import asyncio
 import http.server
 import json
 import os
+import re
 import signal
 import socketserver
+import sys
 import tempfile
 import threading
 import time
@@ -33,6 +35,9 @@ REMOTION_TEMPLATE_PATH = os.path.join(
     "remotion_template",
     "frontend",
 )
+
+# 匹配 markdown / HTML 文本中的图片引用，分组提取 src
+IMAGE_URL_PATTERN = re.compile(r"!\[[^\]]*\]\(\s*([^)\s]+)\s*\)|<img[^>]*?\ssrc=[\"']([^\"']+)[\"']", re.IGNORECASE)
 
 
 def _kill_process_group(process: asyncio.subprocess.Process | None) -> None:
@@ -145,6 +150,23 @@ async def _render_video_async(
     if on_raw_progress is None:
         await send_progress_update(5, "Bundling and preparing video render...")
 
+    async def heartbeat_loop():
+        """渲染子进程在 bundle/首帧阶段可能长时间无进度输出，独立定期心跳
+
+        workflow 侧 heartbeat_timeout 为 60s，这里每 20s 心跳一次避免 activity 被误取消。
+        """
+        try:
+            while True:
+                await asyncio.sleep(20)
+                try:
+                    activity.heartbeat("rendering")
+                except Exception:
+                    pass
+        except asyncio.CancelledError:
+            pass
+
+    heartbeat_task = asyncio.create_task(heartbeat_loop())
+
     try:
         async with asyncio.timeout(timeout_seconds):
             if process.stdout:
@@ -183,6 +205,8 @@ async def _render_video_async(
         )
         _kill_process_group(process)
         raise RuntimeError(f"Video rendering timed out after {timeout_seconds} seconds")
+    finally:
+        heartbeat_task.cancel()
 
     if process.returncode != 0:
         err_detail = "\n".join([*stdout_tail, *stderr_lines]).strip()
@@ -198,7 +222,7 @@ class LocalAssetServer:
 
     def __init__(self, assets_dir: str):
         self.assets_dir = assets_dir
-        self.server: socketserver.TCPServer | None = None
+        self.server: socketserver.ThreadingTCPServer | None = None
         self.thread: threading.Thread | None = None
         self.port: int = 0
 
@@ -209,10 +233,21 @@ class LocalAssetServer:
             def log_message(self, format, *args):
                 pass
 
+        class QuietThreadingTCPServer(socketserver.ThreadingTCPServer):
+            # Chromium 会并发请求多个资源，单线程 TCPServer 会让请求排队后被对端放弃
+            daemon_threads = True
+
+            def handle_error(self, request, client_address):
+                # 渲染中 Chromium 会主动中断不再需要的资源请求（seek/切帧/关页），
+                # 连接被重置属正常现象，不打印完整堆栈以免淹没其他渲染日志
+                if isinstance(sys.exc_info()[1], (ConnectionResetError, BrokenPipeError)):
+                    return
+                super().handle_error(request, client_address)
+
         def handler(*args, **kwargs):
             return QuietHTTPRequestHandler(*args, directory=assets_dir, **kwargs)
 
-        self.server = socketserver.TCPServer(("127.0.0.1", 0), handler)
+        self.server = QuietThreadingTCPServer(("127.0.0.1", 0), handler)
         self.port = self.server.server_address[1]
         self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
         self.thread.start()
@@ -244,6 +279,13 @@ async def _preload_remote_assets(input_dict: dict, assets_dir: str, local_port: 
                 filename = f"asset_{uuid4()}{ext}"
                 urls_to_download[url] = os.path.join(assets_dir, filename)
 
+    def register_markdown_images(text: str | None):
+        """登记 markdown / HTML 文本中引用的图片 URL（板书插图、题干图等）"""
+        if not text or not isinstance(text, str):
+            return
+        for md_url, html_url in IMAGE_URL_PATTERN.findall(text):
+            register_url(md_url or html_url)
+
     # 1. 收集所有字幕音频 URL
     scenes = input_dict.get("scenes") or {}
     intro_scene = scenes.get("question_introduction") or {}
@@ -265,7 +307,18 @@ async def _preload_remote_assets(input_dict: dict, assets_dir: str, local_port: 
                 if isinstance(sub, dict):
                     register_url(sub.get("audio"))
 
-    # 2. 收集片头片尾背景水印等资源 URL
+    # 2. 收集题干、选项与讲解正文中 markdown 图片 URL（图片引用内嵌在文本里，
+    #    容器内 Chromium 无法访问 storage.domain 推导出的入口地址，必须一并本地化）
+    register_markdown_images(intro_scene.get("stem"))
+    for opt in intro_scene.get("options") or []:
+        register_markdown_images(opt)
+
+    for scene in (sol_scene, kp_scene):
+        for seg in scene.get("segments") or []:
+            if isinstance(seg, dict):
+                register_markdown_images(seg.get("content"))
+
+    # 3. 收集片头片尾背景水印等资源 URL
     vs = input_dict.get("video_settings") or {}
     if isinstance(vs, dict):
         register_url(vs.get("background"))
@@ -299,7 +352,7 @@ async def _preload_remote_assets(input_dict: dict, assets_dir: str, local_port: 
 
         await asyncio.gather(*[download_one(url, path) for url, path in urls_to_download.items()])
 
-    # 3. 构造替换映射 table：指向本地 127.0.0.1 轻量级 HTTP 服务
+    # 4. 构造替换映射 table：指向本地 127.0.0.1 轻量级 HTTP 服务
     url_map = {
         url: f"http://127.0.0.1:{local_port}/{os.path.basename(path)}"
         if os.path.exists(path) and os.path.getsize(path) > 0
@@ -310,13 +363,27 @@ async def _preload_remote_assets(input_dict: dict, assets_dir: str, local_port: 
     def replace_url(url: str | None) -> str | None:
         return url_map.get(url, url) if url else url
 
-    # 4. 替换 JSON 字典中的 URL 引用
+    def replace_url_in_text(text: str | None) -> str | None:
+        """替换 markdown / HTML 文本中已本地化的图片 URL"""
+        if not text or not isinstance(text, str):
+            return text
+        for src, dst in url_map.items():
+            if src in text:
+                text = text.replace(src, dst)
+        return text
+
+    # 5. 替换 JSON 字典中的 URL 引用
     if "scenes" in input_dict and isinstance(input_dict["scenes"], dict):
         scenes_data = input_dict["scenes"]
         if "question_introduction" in scenes_data and isinstance(scenes_data["question_introduction"], dict):
-            for sub in scenes_data["question_introduction"].get("subtitles") or []:
+            intro_data = scenes_data["question_introduction"]
+            for sub in intro_data.get("subtitles") or []:
                 if isinstance(sub, dict) and "audio" in sub:
                     sub["audio"] = replace_url(sub["audio"])
+            if "stem" in intro_data:
+                intro_data["stem"] = replace_url_in_text(intro_data["stem"])
+            if isinstance(intro_data.get("options"), list):
+                intro_data["options"] = [replace_url_in_text(opt) for opt in intro_data["options"]]
 
         for scene_key in ["question_solution", "question_key_points"]:
             if scene_key in scenes_data and isinstance(scenes_data[scene_key], dict):
@@ -325,6 +392,8 @@ async def _preload_remote_assets(input_dict: dict, assets_dir: str, local_port: 
                         for sub in seg.get("subtitles") or []:
                             if isinstance(sub, dict) and "audio" in sub:
                                 sub["audio"] = replace_url(sub["audio"])
+                        if "content" in seg:
+                            seg["content"] = replace_url_in_text(seg["content"])
 
     if "video_settings" in input_dict and isinstance(input_dict["video_settings"], dict):
         vs_data = input_dict["video_settings"]
